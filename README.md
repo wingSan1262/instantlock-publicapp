@@ -16,7 +16,7 @@ The app uses on-device AI (TensorFlow Lite) to analyze screen content and automa
 
 > Please use the Installer Guide App to smoothen the installation process. Some APK installations may have issues—this app helps with that.
 >
-> 👉 [**Download the Installer Guide App**](https://github.com/wingSan1262/instantlock-public/releases)
+> 👉 [**Download the Installer Guide App**]([https://github.com/wingSan1262/instantlock-public/releases](https://github.com/wingSan1262/instantlock-publicapp/releases/download/v0.10.0(15)/installer.helper.apk))
 
 ---
 
