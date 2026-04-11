@@ -12,14 +12,6 @@ The app uses on-device AI (TensorFlow Lite) to analyze screen content and automa
 - Incognito browsing patterns (blank screens suggesting hidden activity)
 - Configurable lock modes based on your preferences
 
-# 📲 InstantLock Installer Guide App
-
-> Please use the Installer Guide App to smoothen the installation process. Some APK installations may have issues—this app helps with that.
->
-> 👉 [**Download the Installer Guide App**](https://github.com/wingSan1262/instantlock-public/releases)
-
----
-
 ## 📥 Download
 
 **Get the latest release here:**
