@@ -56,6 +56,7 @@ import com.risyan.quickshutdownphone.base.showInAppQuestionDialog
 import com.risyan.quickshutdownphone.base.showSystemAnnouncement
 import com.risyan.quickshutdownphone.base.showToast
 import com.risyan.quickshutdownphone.screen_content_guard.widget.AutoSpecificInstruction
+import com.risyan.quickshutdownphone.base.openAppInfo
 import kotlin.system.exitProcess
 
 fun NavGraphBuilder.SetupScreen() {
@@ -303,6 +304,21 @@ fun SetupContent(
                     Text(text = stringResource(id = R.string.grant))
                 }
             },
+            supportingContent = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "If you see 'Restricted Access' when enabling Accessibility, you can lift this by clicking the 3 dots in the app info and selecting 'Allow Restricted Access'.",
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    )
+                    Button(
+                        onClick = { context.openAppInfo() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Open App Info")
+                    }
+                }
+            }
         )
 
         AutoSpecificInstruction{ isAutoStartSpecDevice ->

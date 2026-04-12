@@ -85,7 +85,7 @@ fun InstallerGuideScreen() {
         Spacer(modifier = Modifier.height(12.dp))
         Text("2. Download the correct APK from GitHub:", style = MaterialTheme.typography.titleMedium)
         Button(onClick = {
-            val url = "https://github.com/wingSan1262/instantlock-public/releases"
+            val url = "https://github.com/wingSan1262/instantlock-publicapp/releases"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             context.startActivity(intent)
         }) {

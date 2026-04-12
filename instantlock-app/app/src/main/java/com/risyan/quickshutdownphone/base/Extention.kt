@@ -729,3 +729,10 @@ fun Context.openUrl(url: String) {
     i.data = Uri.parse(url)
     startActivity(i)
 }
+
+fun Context.openAppInfo() {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    intent.data = Uri.parse("package:" + packageName)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    startActivity(intent)
+}
