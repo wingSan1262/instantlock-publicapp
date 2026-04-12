@@ -16,14 +16,14 @@ The app uses on-device AI (TensorFlow Lite) to analyze screen content and automa
 
 Please use the Installer Guide App to smoothen the installation process. Some APK installations may have issues—this app helps with that.
 
-**[Download the Installer Guide App](https://github.com/wingSan1262/instantlock-publicapp/releases/download/v0.10.0(15)/installer.helper.apk)**
+**[Download the Installer Guide App](https://github.com/wingSan1262/instantlock-publicapp/releases/download/v0.11.0(16)/installer.apk)**
 
 ---
 
 ## 📥 Download
 
 **Get the latest release here:**
-**[Download InstantLock APK](https://github.com/wingSan1262/instantlock-public/releases)**
+**[Download InstantLock APK](https://github.com/wingSan1262/instantlock-publicapp/releases)**
 
 Choose from architecture-specific APKs for optimal performance:
 - `app-arm64-v8a-release.apk` - For modern 64-bit ARM devices (recommended)
@@ -60,7 +60,7 @@ Choose from architecture-specific APKs for optimal performance:
 
 ## 🚀 Getting Started
 
-1. **Download** the appropriate APK from [Releases](https://github.com/wingSan1262/instantlock-public/releases)
+1. **Download** the appropriate APK from [Releases](https://github.com/wingSan1262/instantlock-publicapp/releases)
 2. **Install** the APK on your Android 11+ device (minSdk 30)
 3. **Grant permissions** - Follow the in-app setup wizard
 4. **Configure lock modes** - Choose which detection modes to enable
