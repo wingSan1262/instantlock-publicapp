@@ -445,7 +445,7 @@ class AiNsfwGraderImp(
         ownerScope.launch(Dispatchers.IO) {
 
             // Enhance the original bitmap FIRST for better detection in dark scenes
-            val optimizedBitmap = imageEnhancer.enhanceImage(bitmap)
+            val optimizedBitmap = bitmap
 
             // Then crop from the enhanced bitmap
             val centerCrop = optimizedBitmap.cropCenterSquare()

@@ -24,6 +24,13 @@ enum class ShutdownType(
         MyApp.getInstance().getString(R.string.denied_bonk),
         5000
     ),
+    QUICK_10_MINUTES_WITH_LONG_INTERVAL(
+        10 * 60,
+        R.drawable.lock_meme,
+        MyApp.getInstance().getString(R.string.you_entered_the_forbidden_land) + " Again!",
+        MyApp.getInstance().getString(R.string.denied_bonk),
+        30000
+    ),
     QUICK_5_MINUTES_NFSW(
 //        5,
         5 * 60,

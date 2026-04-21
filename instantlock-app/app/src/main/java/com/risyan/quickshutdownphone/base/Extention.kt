@@ -167,7 +167,8 @@ suspend fun Context.showDialogAndInitLock(
 ){
     val newLockStatus = LockStatus(
         true,
-        getCurrentDatePlusSeconds(duration)
+        getCurrentDatePlusSeconds(duration),
+        type.timeUntilLock
     )
     lockDialogGlobal = CustomBonkDialog(
         this,
@@ -182,7 +183,11 @@ suspend fun Context.showDialogAndInitLock(
     sharedPrefApi.saveLockStatus(
         newLockStatus
     )
+    if(isLockOnDelay){
+        return
+    }
     lockDialogGlobal?.show()
+    isLockOnDelay = true
     delay(type.timeUntilLock.toLong())
     lockDialogGlobal?.dismiss()
     doLock()
@@ -312,12 +317,15 @@ suspend fun Context.showIncognitoWarning(
 }
 
 var lockDialogGlobal: Dialog? = null
+var isLockOnDelay = false
 suspend fun Context.reLockAndNotifyOrRemoveIfExpired(
     sharedPrefApi: SharedPrefApi,
 ) {
     val lockStatus = sharedPrefApi.getLockStatus()
-    lockDialogGlobal?.dismiss()
     if (lockStatus?.startLock == true && lockStatus.endLock > System.currentTimeMillis()) {
+        if(isLockOnDelay){
+            return
+        }
         lockDialogGlobal = CustomBonkDialog(
             this,
             getString(R.string.you_are_being_denied_from_this_phone),
@@ -326,11 +334,13 @@ suspend fun Context.reLockAndNotifyOrRemoveIfExpired(
             R.drawable.lockdown_notice
         )
         lockDialogGlobal?.show()
-        delay(5000)
+        isLockOnDelay = true
+        delay(lockStatus.lockIntervalTime.toLong())
         lockDialogGlobal?.dismiss()
         doLock()
         return
     }
+    lockDialogGlobal?.dismiss()
     sharedPrefApi.removeLockStatus()
 }
 
@@ -420,6 +430,7 @@ fun Context.showSystemAnnouncement(
 
 
 fun Context.doLock() {
+    isLockOnDelay = false
     val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
     val compName = ComponentName(this, MyAdmin::class.java)
 

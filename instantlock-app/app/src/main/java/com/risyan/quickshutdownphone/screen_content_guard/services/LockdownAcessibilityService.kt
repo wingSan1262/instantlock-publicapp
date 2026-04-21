@@ -131,13 +131,18 @@ class LockdownAcessibilityService : AccessibilityService() {
                 if (gradeFuzzyOccurrence(
                     safe, nsfw, blank, ::resetCounters
                 )){
-                    checkJobAndSaveLockStatus(ShutdownType.QUICK_3_MINUTES_NFSW, sharedPrefApi)
+                    val currentTime = System.currentTimeMillis()
+                    val lastNsfwTime = sharedPrefApi.getLastTimeUserDoNsfwCheck()
+                    var type = ShutdownType.QUICK_3_MINUTES_NFSW
+                    if (lastNsfwTime > 0 && (currentTime - lastNsfwTime) < 10 * 60 * 1000) {
+                        type = ShutdownType.QUICK_10_MINUTES_WITH_LONG_INTERVAL
+                    }
+                    sharedPrefApi.setLastTimeUserDoNsfwCheck(currentTime)
+                    checkJobAndSaveLockStatus(type, sharedPrefApi)
+                    return@doNsfwCheck
                 }
             }
         }
     }
 
 }
-
-
-

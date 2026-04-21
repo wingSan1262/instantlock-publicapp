@@ -10,7 +10,8 @@ import com.google.gson.Gson
 @Parcelize
 data class LockStatus(
     var startLock: Boolean,
-    var endLock: Long
+    var endLock: Long,
+    var lockIntervalTime: Int
 ) : Parcelable {
     fun getRemainingDurationTo(
         context: Context
@@ -19,7 +20,6 @@ data class LockStatus(
         val message = value.toMinuteAndSecondFormat(context)
         return message
     }
-
 }
 
 // reminder to activate accessibility
@@ -130,5 +130,21 @@ class SharedPrefApi(context: Context) {
         val gson = Gson()
         val json = prefs.getString("accessibility_reminder", null)
         return gson.fromJson(json, AccessibilityReminder::class.java)
+    }
+
+    fun setLastTimeUserDoNsfwCheck(time: Long = System.currentTimeMillis()) {
+        val editor = prefs.edit()
+        editor.putLong("last_time_user_do_nsfw_check", time)
+        editor.apply()
+    }
+
+    fun getLastTimeUserDoNsfwCheck(): Long {
+        return prefs.getLong("last_time_user_do_nsfw_check", 0L)
+    }
+
+
+     fun isAnyActiveLock(): Boolean {
+        val lockStatus = getLockStatus()
+        return lockStatus != null && lockStatus.startLock && lockStatus.endLock > System.currentTimeMillis()
     }
 }
