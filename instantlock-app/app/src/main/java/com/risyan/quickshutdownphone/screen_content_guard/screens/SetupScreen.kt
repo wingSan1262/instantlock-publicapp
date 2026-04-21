@@ -47,6 +47,7 @@ import com.risyan.quickshutdownphone.base.hasStorageAccessNeededInstantLock
 import com.risyan.quickshutdownphone.screen_content_guard.navigator.OnboardNavigator
 import com.risyan.quickshutdownphone.screen_content_guard.navigator.SETUP_PERMISSION
 import com.risyan.quickshutdownphone.base.openAdminPermissionSetting
+import com.risyan.quickshutdownphone.base.openAllAppsSettings
 import com.risyan.quickshutdownphone.base.openOverlayPermissionSetting
 import com.risyan.quickshutdownphone.base.requestAccessibilityService
 import com.risyan.quickshutdownphone.base.requestNotificationAccess
@@ -307,12 +308,12 @@ fun SetupContent(
             supportingContent = {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "If you see 'Restricted Access' when enabling Accessibility, you can lift this by clicking the 3 dots in the app info and selecting 'Allow Restricted Access'.",
+                        text = "If you see 'Restricted Access' when enabling Accessibility, you can lift this by navigate to Apps menu in device setting, search instant lock (quickshutdown) and open, clicking the 3 dots in the app info and selecting 'Allow Restricted Access'.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
                     Button(
-                        onClick = { context.openAppInfo() },
+                        onClick = { context.openAllAppsSettings() },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(text = "Open App Info")

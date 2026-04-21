@@ -18,6 +18,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -746,4 +747,49 @@ fun Context.openAppInfo() {
     intent.data = Uri.parse("package:" + packageName)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     startActivity(intent)
+}
+
+/**
+ * Crop the bitmap into [count] vertical squares, evenly distributed from top to bottom.
+ * If the bitmap is landscape, rotate it to portrait first.
+ * Each crop is a square of size min(width, height). The first crop starts at the top,
+ * the last crop ends at the bottom, and the rest are evenly spaced.
+ */
+fun Bitmap.cropVerticalSquares(count: Int): List<Bitmap> {
+    require(count > 1) { "count must be at least 2" }
+    var workingBitmap = this
+    if (width > height) {
+        // Rotate to portrait
+        val matrix = Matrix()
+        matrix.postRotate(90f)
+        workingBitmap = Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+    }
+    val size = min(workingBitmap.width, workingBitmap.height)
+    val maxYOffset = workingBitmap.height - size
+    if (maxYOffset <= 0) {
+        // Image is already square
+        return List(count) { Bitmap.createBitmap(workingBitmap, 0, 0, size, size) }
+    }
+    val step = if (count == 1) 0 else maxYOffset / (count - 1)
+    return List(count) { i ->
+        val y = if (i == count - 1) maxYOffset else i * step
+        Bitmap.createBitmap(workingBitmap, 0, y, size, size)
+    }
+}
+
+fun Context.openAllAppsSettings() {
+    try {
+        val intent = Intent(android.provider.Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    } catch (e: Exception) {
+        // Fallback for older devices
+        try {
+            val intent = Intent(android.provider.Settings.ACTION_APPLICATION_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+    }
 }

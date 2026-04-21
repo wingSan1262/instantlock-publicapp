@@ -14,6 +14,7 @@ import com.risyan.quickshutdownphone.base.cropBottomSquare
 import com.risyan.quickshutdownphone.base.cropCenterShavedSquare
 import com.risyan.quickshutdownphone.base.cropCenterSquare
 import com.risyan.quickshutdownphone.base.cropTopSquare
+import com.risyan.quickshutdownphone.base.cropVerticalSquares
 import com.risyan.quickshutdownphone.screen_content_guard.services.LockdownAcessibilityService
 import com.risyan.quickshutdownphone.base.showToast
 import kotlinx.coroutines.CoroutineScope
@@ -443,58 +444,27 @@ class AiNsfwGraderImp(
         onOccurrence: (safe: Int, nsfw: Int, bitmap: Bitmap) -> Unit
     ) {
         ownerScope.launch(Dispatchers.IO) {
-
-            // Enhance the original bitmap FIRST for better detection in dark scenes
             val optimizedBitmap = bitmap
 
-            // Then crop from the enhanced bitmap
-            val centerCrop = optimizedBitmap.cropCenterSquare()
-            val topCrop = optimizedBitmap.cropTopSquare().cropCenterShavedSquare(0.7f)
-            val bottomCrop = optimizedBitmap.cropBottomSquare().cropCenterShavedSquare(0.7f)
-//
-//            // Body area detection with optimized crops
-//            if(
-//                !bodyAreaDetector.isNsfwBodyArea(centerCrop) &&
-//                !bodyAreaDetector.isNsfwBodyArea(topCrop) &&
-//                !bodyAreaDetector.isNsfwBodyArea(bottomCrop)
-//            ){
-//                owner.sharedPrefApi.setCurrentSafeCounter(
-//                    owner.sharedPrefApi.getCurrentSafeCounter() + 1
-//                )
-//                withContext(Dispatchers.Main) {
-//                    onOccurrence(
-//                        owner.sharedPrefApi.getCurrentSafeCounter(),
-//                        owner.sharedPrefApi.getCurrentNsfwCounter(),
-//                        centerCrop
-//                    )
-//                }
-//                return@launch
-//            }
-
+            val cropCollection = optimizedBitmap.cropVerticalSquares(5)
 
             val nsfwCount = owner.sharedPrefApi.getCurrentNsfwCounter()
             val safeCount = owner.sharedPrefApi.getCurrentSafeCounter()
 
-            // Use optimized crops for NSFW model detection
-            var sexyJudgement = judgeSexyNsfwModelAi(centerCrop)
-            trackNsfwOccurence(centerCrop, sexyJudgement)
-            if (nsfwCount == owner.sharedPrefApi.getCurrentNsfwCounter()) {
-                owner.sharedPrefApi.setCurrentSafeCounter(safeCount) // TODO Hacky manual hardcode reset
-                sexyJudgement = judgeSexyNsfwModelAi(topCrop)
-                trackNsfwOccurence(topCrop, sexyJudgement)
-            }
+            for (crop in cropCollection) {
+                val sexyJudgement = judgeSexyNsfwModelAi(crop)
+                trackNsfwOccurence(crop, sexyJudgement)
 
-            if (nsfwCount == owner.sharedPrefApi.getCurrentNsfwCounter()) {
-                owner.sharedPrefApi.setCurrentSafeCounter(safeCount) // TODO Hacky manual hardcode reset
-                sexyJudgement = judgeSexyNsfwModelAi(bottomCrop)
-                trackNsfwOccurence(bottomCrop, sexyJudgement)
+                if (nsfwCount != owner.sharedPrefApi.getCurrentNsfwCounter()) {
+                    break
+                }
+                owner.sharedPrefApi.setCurrentSafeCounter(safeCount)
             }
-
             withContext(Dispatchers.Main) {
                 onOccurrence(
                     owner.sharedPrefApi.getCurrentSafeCounter(),
                     owner.sharedPrefApi.getCurrentNsfwCounter(),
-                    centerCrop
+                    cropCollection[cropCollection.size / 2]
                 )
             }
         }

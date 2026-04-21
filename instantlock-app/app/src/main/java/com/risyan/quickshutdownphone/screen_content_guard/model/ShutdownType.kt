@@ -29,7 +29,7 @@ enum class ShutdownType(
         R.drawable.lock_meme,
         MyApp.getInstance().getString(R.string.you_entered_the_forbidden_land) + " Again!",
         MyApp.getInstance().getString(R.string.denied_bonk),
-        30000
+        10000
     ),
     QUICK_5_MINUTES_NFSW(
 //        5,
