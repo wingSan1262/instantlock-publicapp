@@ -71,7 +71,8 @@ class ForegroundAppDetector(
         "com.duckduckgo.mobile.android", "org.torproject.torbrowser",
         "com.kiwibrowser.browser", "com.ecosia.android", "org.bromite.bromite",
         "com.mi.globalbrowser", "com.vivo.browser", "com.huawei.browser", // OEM
-        "com.android.browser", "com.google.android.browser" // Generic/AOSP
+        "com.android.browser", "com.google.android.browser", // Generic/AOSP
+        "com.hsv.freeadblocker", "com.hsv.freeadblockerbrowser"
     )
 
     /**
