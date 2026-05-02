@@ -60,6 +60,20 @@ class ForegroundAppDetector(
         "com.grind.android",             // Grindr
     )
 
+    // Browsers to blacklist (except Chrome)
+    private val blacklistedBrowsers = setOf(
+        "org.mozilla.firefox", "org.mozilla.firefox_beta", "org.mozilla.fenix", "org.mozilla.focus", "org.mozilla.klar", // Firefox
+        "com.opera.browser", "com.opera.mini.native", "com.opera.gx", // Opera
+        "com.microsoft.emmx", "com.microsoft.emmx.beta", "com.microsoft.emmx.canary", // Edge
+        "com.sec.android.app.sbrowser", "com.sec.android.app.sbrowser.beta", // Samsung
+        "com.UCMobile.intl", "com.uc.browser.en", // UC Browser
+        "com.brave.browser", "com.vivaldi.browser", "com.yandex.browser",
+        "com.duckduckgo.mobile.android", "org.torproject.torbrowser",
+        "com.kiwibrowser.browser", "com.ecosia.android", "org.bromite.bromite",
+        "com.mi.globalbrowser", "com.vivo.browser", "com.huawei.browser", // OEM
+        "com.android.browser", "com.google.android.browser" // Generic/AOSP
+    )
+
     /**
      * Update current package from AccessibilityEvent
      */
@@ -125,6 +139,28 @@ class ForegroundAppDetector(
     }
 
     /**
+     * Check if current app is a blacklisted browser (except Chrome)
+     */
+    fun isBlacklistedBrowser(): Boolean {
+        return currentPackageName in blacklistedBrowsers
+    }
+
+    /**
+     * Check if current app is Telegram
+     */
+    fun isTelegram(): Boolean {
+        return currentPackageName == "org.telegram.messenger"
+    }
+
+    /**
+     * Check if current app is blacklisted (browser except Chrome, Telegram, or blacklisted social media)
+     */
+    fun isBlacklistedApp(): Boolean {
+        // Chrome package: com.android.chrome
+        return (isBlacklistedBrowser() || isTelegram() || isBlacklistedSocialMedia())
+    }
+
+    /**
      * Get risk level for current app
      * @return Risk multiplier (1.0 = normal, higher = more strict detection)
      */
@@ -182,7 +218,7 @@ class ForegroundAppDetector(
 
         ownerScope.launch(Dispatchers.Main) {
             try {
-                val isBlacklisted = isBlacklistedSocialMedia()
+                val isBlacklisted = isBlacklistedApp()
 
                 if (!isBlacklisted) {
                     return@launch

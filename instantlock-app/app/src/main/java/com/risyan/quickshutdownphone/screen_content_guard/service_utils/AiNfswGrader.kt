@@ -15,6 +15,7 @@ import com.risyan.quickshutdownphone.base.cropCenterShavedSquare
 import com.risyan.quickshutdownphone.base.cropCenterSquare
 import com.risyan.quickshutdownphone.base.cropTopSquare
 import com.risyan.quickshutdownphone.base.cropVerticalSquares
+import com.risyan.quickshutdownphone.base.getSquareCropPossibleCollections
 import com.risyan.quickshutdownphone.screen_content_guard.services.LockdownAcessibilityService
 import com.risyan.quickshutdownphone.base.showToast
 import kotlinx.coroutines.CoroutineScope
@@ -308,7 +309,7 @@ class AiNsfwGraderImp(
     private val OUTPUT_FILE_NFSW_COUNT = 2;
     private val OUTPUT_FILE_SEXY_NFSW_COUNT = 5;
 
-    private val NFSW_THRESHOLD = 0.7
+    private val NFSW_THRESHOLD = 0.55f
 
     private val nsfwInterpreter: Interpreter by lazy {
         Interpreter(loadNsfwModel(NSFW_FILE)) // Use the Interpreter class to create an instance
@@ -446,20 +447,22 @@ class AiNsfwGraderImp(
         ownerScope.launch(Dispatchers.IO) {
             val optimizedBitmap = bitmap
 
-            val cropCollection = optimizedBitmap.cropVerticalSquares(5)
+            val cropCollection = optimizedBitmap.getSquareCropPossibleCollections(5)
 
             val nsfwCount = owner.sharedPrefApi.getCurrentNsfwCounter()
             val safeCount = owner.sharedPrefApi.getCurrentSafeCounter()
 
+            var safeIncrement = 1
             for (crop in cropCollection) {
                 val sexyJudgement = judgeSexyNsfwModelAi(crop)
                 trackNsfwOccurence(crop, sexyJudgement)
 
                 if (nsfwCount != owner.sharedPrefApi.getCurrentNsfwCounter()) {
+                    safeIncrement = 0
                     break
                 }
-                owner.sharedPrefApi.setCurrentSafeCounter(safeCount)
             }
+            owner.sharedPrefApi.setCurrentSafeCounter(safeCount + safeIncrement)
             withContext(Dispatchers.Main) {
                 onOccurrence(
                     owner.sharedPrefApi.getCurrentSafeCounter(),

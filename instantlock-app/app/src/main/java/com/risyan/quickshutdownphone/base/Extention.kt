@@ -88,6 +88,17 @@ fun Bitmap.cropCenterShavedSquare(ratio: Float = 0.75f): Bitmap {
     )
 }
 
+fun Bitmap.getSquareCropPossibleCollections(numberOfCollection: Int) : List<Bitmap>{
+    val bitmap = this
+    val dimension = min(bitmap.width, bitmap.height)
+    val yOffsetBottomStart = bitmap.height - dimension
+    val offsetStep = if(numberOfCollection > 1) yOffsetBottomStart / (numberOfCollection - 1) else 0
+    return List(numberOfCollection) { i ->
+        val yOffset = if (i == numberOfCollection - 1) yOffsetBottomStart else i * offsetStep
+        Bitmap.createBitmap(bitmap, 0, yOffset, dimension, dimension)
+    }
+}
+
 fun Bitmap.cropTopSquare(): Bitmap {
     val bitmap = this
     val dimension = min(bitmap.width, bitmap.height)
