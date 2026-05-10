@@ -11,6 +11,9 @@ data class UserLockSetting(
     var lockByNsfw: Boolean = true,
     var lockBySexy: Boolean = true,
     var nightTime: Boolean = false,
+    var totalCountMultiplier: Int = 1,
+    var incognitoDialogMode: Boolean = true,
+    var trackBlacklistedApps: Boolean = true,
 ) : Parcelable
 
 class UserSettingsApi(context: Context) {

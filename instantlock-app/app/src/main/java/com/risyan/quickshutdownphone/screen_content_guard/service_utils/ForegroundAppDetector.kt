@@ -60,6 +60,33 @@ class ForegroundAppDetector(
         "com.grind.android",             // Grindr
     )
 
+    // Safe/system packages immune to any NSFW detection
+    private val safePackages = setOf(
+        "com.android.systemui",                      // System UI / Status bar
+        "com.android.settings",                      // Android Settings
+        "com.google.android.packageinstaller",        // Package Installer
+        "com.android.packageinstaller",              // Package Installer (AOSP)
+        "com.android.launcher",                      // AOSP Launcher
+        "com.google.android.apps.nexuslauncher",     // Pixel Launcher
+        "com.sec.android.app.launcher",              // Samsung Launcher
+        "com.miui.home",                             // MIUI Launcher
+        "com.huawei.android.launcher",               // Huawei Launcher
+        "com.vivo.launcher",                         // Vivo Launcher
+        "com.oppo.launcher",                         // Oppo Launcher
+        "com.android.dialer",                        // Phone/Dialer (AOSP)
+        "com.google.android.dialer",                 // Google Dialer
+        "com.android.contacts",                      // Contacts
+        "com.android.phone",                         // Phone app
+        "com.android.server.telecom",                // Telecom Service
+        "com.android.inputmethod.latin",             // Keyboard (AOSP)
+        "com.google.android.inputmethod.latin",      // Gboard
+        "com.samsung.android.honeyboard",            // Samsung Keyboard
+        "android",                                   // Android OS itself
+        "com.android.keyguard",                      // Keyguard / Lock screen
+        "com.android.permissioncontroller",          // Permission dialogs
+        "com.google.android.permissioncontroller",   // Permission dialogs (Google)
+    )
+
     // Browsers to blacklist (except Chrome)
     private val blacklistedBrowsers = setOf(
         "org.mozilla.firefox", "org.mozilla.firefox_beta", "org.mozilla.fenix", "org.mozilla.focus", "org.mozilla.klar", // Firefox
@@ -88,6 +115,13 @@ class ForegroundAppDetector(
      * Get current foreground package name
      */
     fun getCurrentPackage(): String? = currentPackageName
+
+    /**
+     * Check if current app is a safe/system package immune to NSFW detection
+     */
+    fun isSafePackage(): Boolean {
+        return currentPackageName in safePackages
+    }
 
     /**
      * Check if current app is Twitter/X
@@ -233,6 +267,9 @@ class ForegroundAppDetector(
                     ownerScope.launch(Dispatchers.Main) {
                         sharedPreferences.setCurrentBlankImageCounter(
                             sharedPreferences.getCurrentBlankImageCounter() + 1
+                        )
+                        sharedPreferences.setCurrentSafeCounter(
+                            (sharedPreferences.getCurrentSafeCounter() - 1).coerceAtLeast(0)
                         )
                     }
                 }

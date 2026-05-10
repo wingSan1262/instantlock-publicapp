@@ -19,25 +19,25 @@ class UserUnlockReceiver(
     val sharedPrefApi: SharedPrefApi = myApp.sharedPrefApi,
 ): BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (Intent.ACTION_USER_PRESENT == intent.action) {
-            job?.cancel()
-            job = CoroutineScope(Dispatchers.Main).launch {
-                sharedPrefApi.setPhoneActiveStatus(true)
-                context.reLockAndNotifyOrRemoveIfExpired(sharedPrefApi)
-            }
-            return
-        }
-
-
-        if(Intent.ACTION_SCREEN_OFF == intent.action) {
-            sharedPrefApi.setPhoneActiveStatus(false)
-            return;
-        }
-
-        if(Intent.ACTION_SCREEN_ON == intent.action) {
-            sharedPrefApi.setPhoneActiveStatus(true)
-            return;
-        }
+//        if (Intent.ACTION_USER_PRESENT == intent.action) {
+//            job?.cancel()
+//            job = CoroutineScope(Dispatchers.Main).launch {
+//                sharedPrefApi.setPhoneActiveStatus(true)
+//                context.reLockAndNotifyOrRemoveIfExpired(sharedPrefApi)
+//            }
+//            return
+//        }
+//
+//
+//        if(Intent.ACTION_SCREEN_OFF == intent.action) {
+//            sharedPrefApi.setPhoneActiveStatus(false)
+//            return;
+//        }
+//
+//        if(Intent.ACTION_SCREEN_ON == intent.action) {
+//            sharedPrefApi.setPhoneActiveStatus(true)
+//            return;
+//        }
     }
 
     companion object {

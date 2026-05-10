@@ -3,11 +3,12 @@ fun gradeFuzzyOccurrence(
     safeCount: Int,
     nsfwCount: Int,
     blankCount: Int,
-    resetCounters: () -> Unit
+    resetCounters: () -> Unit,
+    totalCountMultiplier: Int = 1
 ): Boolean {
 
     val total = safeCount + nsfwCount + blankCount
-    if (total < 12) return false
+    if (total < 12 * totalCountMultiplier.coerceAtLeast(1)) return false
 
     val safe = safeCount / total.toFloat()
     val nsfw = nsfwCount / total.toFloat()

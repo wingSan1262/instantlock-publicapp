@@ -92,7 +92,7 @@ class LockdownAcessibilityService : AccessibilityService() {
                     this@LockdownAcessibilityService,
                     bitmap.cropSideBarsOnly(),
                 ){ isBlank ->
-                    if(!isBlank){
+                    if(!isBlank && MyApp.getInstance().userSetting.trackBlacklistedApps){
                         foregroundAppDetector.trackIfBlacklisted(
                             this@LockdownAcessibilityService
                         )
@@ -126,10 +126,18 @@ class LockdownAcessibilityService : AccessibilityService() {
             return
         }
 
+        if (foregroundAppDetector.isSafePackage()){
+            sharedPrefApi.setCurrentSafeCounter(
+                sharedPrefApi.getCurrentSafeCounter() + 1
+            )
+            return
+        }
+
         screenShotService.takeScreenShot { _, aiOptCropedBm ->
             doNsfwCheck(aiOptCropedBm){ safe, nsfw, blank ->
                 if (gradeFuzzyOccurrence(
-                    safe, nsfw, blank, ::resetCounters
+                    safe, nsfw, blank, ::resetCounters,
+                    totalCountMultiplier = MyApp.getInstance().userSetting.totalCountMultiplier
                 )){
                     val currentTime = System.currentTimeMillis()
                     val lastNsfwTime = sharedPrefApi.getLastTimeUserDoNsfwCheck()

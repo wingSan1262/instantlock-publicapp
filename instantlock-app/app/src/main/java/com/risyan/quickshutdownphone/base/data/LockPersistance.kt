@@ -97,15 +97,6 @@ class SharedPrefApi(context: Context) {
         editor.apply()
     }
 
-    // set screen is non active dimmed, of phone on screen off state
-    fun setPhoneActiveStatus(isIdle: Boolean) {
-        val editor = prefs.edit()
-        editor.putBoolean("is_phone_active", isIdle)
-        editor.apply()
-    }
-    fun getPhoneActiveStatus(): Boolean {
-        return prefs.getBoolean("is_phone_active", true)
-    }
 
     fun saveAccessibilityReminder() {
         // 10 minutes

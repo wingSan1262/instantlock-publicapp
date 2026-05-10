@@ -61,20 +61,27 @@ fun NavGraphBuilder.MainSettingScreen(){
         MainScreenContent(
             rememberUserSetting.lockByNsfw,
             rememberUserSetting.lockBySexy,
-            rememberUserSetting.nightTime
-        ){ nsfw, sexy, night ->
+            rememberUserSetting.nightTime,
+            rememberUserSetting.totalCountMultiplier,
+            rememberUserSetting.incognitoDialogMode,
+            rememberUserSetting.trackBlacklistedApps
+        ){ nsfw, sexy, night, multiplier, dialogMode, trackBlacklisted ->
             val new = rememberUserSetting.copy(
                 lockByNsfw = nsfw,
                 lockBySexy = sexy,
-                nightTime = night
+                nightTime = night,
+                totalCountMultiplier = multiplier,
+                incognitoDialogMode = dialogMode,
+                trackBlacklistedApps = trackBlacklisted
             )
-            MyApp.getInstance().userLockSetting.saveUserSetting(
-                new
-            )
+            MyApp.getInstance().userLockSetting.saveUserSetting(new)
             MyApp.getInstance().userSetting.apply {
                 lockByNsfw = nsfw
                 lockBySexy = sexy
                 nightTime = night
+                totalCountMultiplier = multiplier
+                incognitoDialogMode = dialogMode
+                trackBlacklistedApps = trackBlacklisted
             }
         }
     }
@@ -87,7 +94,10 @@ fun MainScreenContent(
     nsfwMode: Boolean = true,
     sexyMode: Boolean = true,
     nightTimeMode : Boolean = false,
-    onUpdate: (nfsw: Boolean, sexy: Boolean, night: Boolean) -> Unit = { _, _, _ -> }
+    totalMultiplierMode: Int = 1,
+    incognitoDialogMode: Boolean = true,
+    trackBlacklistedAppsMode: Boolean = true,
+    onUpdate: (nfsw: Boolean, sexy: Boolean, night: Boolean, multiplier: Int, dialogMode: Boolean, trackBlacklisted: Boolean) -> Unit = { _, _, _, _, _, _ -> }
 ) {
 
     var scope = rememberCoroutineScope()
@@ -101,6 +111,9 @@ fun MainScreenContent(
     var nsfwLockMode by remember { mutableStateOf(nsfwMode) }
     var sexyLockMode by remember { mutableStateOf(sexyMode) }
     var nightTimeLockMode by remember { mutableStateOf(nightTimeMode) }
+    var totalMultiplier by remember { mutableStateOf(totalMultiplierMode.coerceIn(1, 4)) }
+    var incognitoDialog by remember { mutableStateOf(incognitoDialogMode) }
+    var trackBlacklisted by remember { mutableStateOf(trackBlacklistedAppsMode) }
 
     Column(
         Modifier
@@ -135,7 +148,7 @@ fun MainScreenContent(
             isChecked = sexyLockMode,
             onCheckedChange = {
                 sexyLockMode = it
-                onUpdate(nsfwLockMode, it, nightTimeLockMode)
+                onUpdate(nsfwLockMode, it, nightTimeLockMode, totalMultiplier, incognitoDialog, trackBlacklisted)
             }
         )
 
@@ -143,8 +156,85 @@ fun MainScreenContent(
             label = stringResource(R.string.night_time_lock_mode),
             isChecked = nightTimeLockMode,
             onCheckedChange = {
-                onUpdate(nsfwLockMode, sexyLockMode, it)
+                nightTimeLockMode = it
+                onUpdate(nsfwLockMode, sexyLockMode, it, totalMultiplier, incognitoDialog, trackBlacklisted)
             }
+        )
+
+        SwitchSetting(
+            label = "Incognito Dialog Mode",
+            isChecked = incognitoDialog,
+            onCheckedChange = {
+                incognitoDialog = it
+                onUpdate(nsfwLockMode, sexyLockMode, nightTimeLockMode, totalMultiplier, it, trackBlacklisted)
+            }
+        )
+
+        if (!incognitoDialog) {
+            Text(
+                text = "⚠️ Dialog off: blank screens count silently. Recommended to use at least Normal sensitivity to avoid false locks.",
+                style = DateStyle.copy(fontSize = 12.sp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp)
+            )
+        }
+
+        // Sensitivity / sampling level stepper (1–4)
+        val levelLabel = when (totalMultiplier) {
+            1 -> "Basic (fast)"
+            2 -> "Normal"
+            3 -> "Strict"
+            4 -> "Very Strict (slow)"
+            else -> "$totalMultiplier"
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Sensitivity Level $totalMultiplier: $levelLabel",
+                modifier = Modifier.weight(1f),
+                style = TextStyle.Default
+            )
+            Button(
+                onClick = {
+                    if (totalMultiplier > 1) {
+                        totalMultiplier--
+                        onUpdate(nsfwLockMode, sexyLockMode, nightTimeLockMode, totalMultiplier, incognitoDialog, trackBlacklisted)
+                    }
+                },
+                enabled = totalMultiplier > 1
+            ) { Text("-") }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = {
+                    if (totalMultiplier < 4) {
+                        totalMultiplier++
+                        onUpdate(nsfwLockMode, sexyLockMode, nightTimeLockMode, totalMultiplier, incognitoDialog, trackBlacklisted)
+                    }
+                },
+                enabled = totalMultiplier < 4
+            ) { Text("+") }
+        }
+
+        SwitchSetting(
+            label = "Track Blacklisted Apps",
+            isChecked = trackBlacklisted,
+            onCheckedChange = {
+                trackBlacklisted = it
+                onUpdate(nsfwLockMode, sexyLockMode, nightTimeLockMode, totalMultiplier, incognitoDialog, it)
+            }
+        )
+
+        Text(
+            text = "When on, apps like Telegram, Firefox, Twitter/X, and similar are tracked and may contribute to a lock trigger.",
+            style = DateStyle.copy(fontSize = 12.sp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))

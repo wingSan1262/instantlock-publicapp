@@ -103,19 +103,31 @@ class NonScreenShotImageGraderImp(
                     return@launch
                 }
 
-//                sharedPreferences.setCurrentBlankImageCounter(
-//                    sharedPreferences.getCurrentBlankImageCounter() + 1
-//                )
+                val incognitoDialogMode = MyApp.getInstance().userSetting.incognitoDialogMode
 
-                context.showIncognitoWarning { isManualDis ->
-                    if(!isManualDis){
-                        return@showIncognitoWarning
+                if (incognitoDialogMode) {
+                    // Dialog mode: only increment after user confirms attention
+                    context.showIncognitoWarning { isManualDis ->
+                        if(!isManualDis){
+                            return@showIncognitoWarning
+                        }
+                        ownerScope.launch(Dispatchers.Main) {
+                            sharedPreferences.setCurrentBlankImageCounter(
+                                sharedPreferences.getCurrentBlankImageCounter() + 1
+                            )
+                            sharedPreferences.setCurrentSafeCounter(
+                                (sharedPreferences.getCurrentSafeCounter() - 1).coerceAtLeast(0)
+                            )
+                        }
                     }
-                    ownerScope.launch(Dispatchers.Main) {
-                        sharedPreferences.setCurrentBlankImageCounter(
-                            sharedPreferences.getCurrentBlankImageCounter() + 1
-                        )
-                    }
+                } else {
+                    // Silent mode: directly increment counter without dialog
+                    sharedPreferences.setCurrentBlankImageCounter(
+                        sharedPreferences.getCurrentBlankImageCounter() + 1
+                    )
+                    sharedPreferences.setCurrentSafeCounter(
+                        (sharedPreferences.getCurrentSafeCounter() - 1).coerceAtLeast(0)
+                    )
                 }
             } catch (e: Exception) {
 
